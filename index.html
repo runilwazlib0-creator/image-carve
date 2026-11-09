@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Carve: V-bit engraving filter</title>
+<meta name="description" content="Turn any photo into a strictly black and white V-carve engraving. Runs entirely in your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect width=%2216%22 height=%2216%22 fill=%22%23000%22/%3E%3Cpath d=%22M3 13 L13 3%22 stroke=%22%23fff%22 stroke-width=%222%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Image Carve</h1>
+  <p>Turn a photo into a black and white V-bit engraving. Light areas become carved grooves; shadows stay as uncut material. Everything runs in your browser. Your image is never uploaded.</p>
+</header>
+<main>
+  <section class="panel" id="controls">
+    <label id="drop" class="drop" tabindex="0">
+      <input type="file" id="file" accept="image/*" hidden>
+      <span id="dropText"><strong>Choose an image</strong> or drop it here</span>
+    </label>
+
+    <div class="sliders">
+      <div class="row"><label for="pitch">Line spacing <output id="pitchV"></output></label>
+        <input type="range" id="pitch" min="2.5" max="8" step="0.1" value="3.8"></div>
+      <div class="row"><label for="length">Stroke length <output id="lengthV"></output></label>
+        <input type="range" id="length" min="10" max="80" step="1" value="32"></div>
+      <div class="row"><label for="gamma">Gamma (lower = more carving) <output id="gammaV"></output></label>
+        <input type="range" id="gamma" min="0.4" max="1.6" step="0.02" value="0.82"></div>
+      <div class="row"><label for="maxw">Max cut width (× spacing) <output id="maxwV"></output></label>
+        <input type="range" id="maxw" min="0.8" max="2.4" step="0.02" value="1.84"></div>
+      <div class="row inline">
+        <label><input type="checkbox" id="invert"> Invert (carve dark areas)</label>
+        <label for="seed">Seed <input type="number" id="seed" value="41" min="0" max="99999"></label>
+      </div>
+      <div class="row inline">
+        <label for="maxdim">Working size
+          <select id="maxdim">
+            <option value="1200">max 1200 px</option>
+            <option value="1600" selected>max 1600 px</option>
+            <option value="2400">max 2400 px (slow)</option>
+            <option value="0">original (slowest)</option>
+          </select></label>
+        <label><input type="checkbox" id="hires" checked> Build 2×/4× high-res</label>
+      </div>
+      <p class="hint">Tip: for photos with a bright background and dark subjects, turn on <em>Invert</em> or the subjects stay as solid silhouettes.</p>
+    </div>
+
+    <div class="actions">
+      <button id="render" disabled>Render</button>
+      <button id="reset" class="ghost" type="button">Reset settings</button>
+    </div>
+    <div id="progressWrap" hidden>
+      <progress id="progress" max="1" value="0"></progress>
+      <span id="status"></span>
+    </div>
+    <div id="downloads" class="actions" hidden>
+      <button id="dl1" class="ghost">Download PNG</button>
+      <button id="dl2" class="ghost">Download 2×</button>
+      <button id="dl4" class="ghost">Download 4×</button>
+    </div>
+    <p id="stats" class="hint"></p>
+  </section>
+
+  <section class="panel viewer">
+    <div class="tabs" role="tablist">
+      <button data-view="side" class="tab active">Side by side</button>
+      <button data-view="result" class="tab">Result</button>
+      <button data-view="original" class="tab">Original</button>
+    </div>
+    <div id="stage" class="stage side">
+      <figure id="origFig"><canvas id="orig"></canvas><figcaption>Original</figcaption></figure>
+      <figure id="outFig"><canvas id="out"></canvas><figcaption>Carved</figcaption></figure>
+      <p id="empty" class="empty">Pick an image to begin.</p>
+    </div>
+  </section>
+</main>
+<footer>Pure client-side. White = carved, black = uncut. A preview image, not a CNC toolpath. <a href="https://github.com/runilwazlib0-creator/image-carve">Source</a></footer>
+<script src="png1bit.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
